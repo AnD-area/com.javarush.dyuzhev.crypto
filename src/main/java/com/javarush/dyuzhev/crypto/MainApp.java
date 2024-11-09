@@ -28,79 +28,15 @@ public class MainApp {
         FileManager fileManager = new FileManager();
         Validator validator = new Validator();
 
-        String outputFilePath = null;
-        String encryptedFilePath = null;
-        String decryptedOutputFilePath = null;
-
         try {
             Set<String> dictionary = DictionaryLoader.loadDictionary("/dictionary/dictionary_russian.txt");
             BruteForce bruteForce = new BruteForce(dictionary);
 
             switch (choice) {
-                case 1:
-                    System.out.println("Введите путь к файлу для шифрования:");
-                    String inputFilePath = scanner.nextLine();
-                    System.out.println("Введите путь к файлу для записи зашифрованного текста:");
-                    outputFilePath = scanner.nextLine();
-                    System.out.println("Введите ключ шифрования:");
-                    int key = scanner.nextInt();
-
-                    if (validator.isFileExists(inputFilePath) && validator.isValidKey(key)) {
-                        try {
-                            String text = fileManager.readFile(inputFilePath);
-                            String encryptedText = cipher.encrypt(text, key);
-                            fileManager.writeFile(encryptedText, outputFilePath);
-                            System.out.println("Файл успешно зашифрован и сохранен.");
-                        } catch (IOException e) {
-                            System.out.println("Ошибка при работе с файлами: " + e.getMessage());
-                        }
-                    } else {
-                        System.out.println("Неверный путь к файлу или ключ.");
-                    }
-                    break;
-                case 2:
-                    System.out.println("Введите путь к зашифрованному файлу:");
-                    encryptedFilePath = scanner.nextLine();
-                    System.out.println("Введите путь к файлу для записи расшифрованного текста:");
-                    decryptedOutputFilePath = scanner.nextLine();
-                    System.out.println("Введите ключ шифрования:");
-                    int decryptionKey = scanner.nextInt();
-
-                    if (validator.isFileExists(encryptedFilePath) && validator.isValidKey(decryptionKey)) {
-                        try {
-                            String encryptedText = fileManager.readFile(encryptedFilePath);
-                            String decryptedText = cipher.decrypt(encryptedText, decryptionKey);
-                            fileManager.writeFile(decryptedText, decryptedOutputFilePath);
-                            System.out.println("Файл успешно расшифрован и сохранен.");
-                        } catch (IOException e) {
-                            System.out.println("Ошибка при работе с файлами: " + e.getMessage());
-                        }
-                    } else {
-                        System.out.println("Неверный путь к файлу или ключ.");
-                    }
-                    break;
-                case 3:
-                    System.out.println("Введите путь к зашифрованному файлу:");
-                    encryptedFilePath = scanner.nextLine();
-                    System.out.println("Введите путь к файлу для записи расшифрованного текста:");
-                    decryptedOutputFilePath = scanner.nextLine();
-
-                    if (validator.isFileExists(encryptedFilePath)) {
-                        try {
-                            String encryptedText = fileManager.readFile(encryptedFilePath);
-                            String decryptedText = bruteForce.decryptByBruteForce(encryptedText, ALPHABET);
-                            fileManager.writeFile(decryptedText, decryptedOutputFilePath);
-                            System.out.println("Файл успешно расшифрован и сохранен.");
-                        } catch (IOException e) {
-                            System.out.println("Ошибка при работе с файлами: " + e.getMessage());
-                        }
-                    } else {
-                        System.out.println("Неверный путь к файлу.");
-                    }
-                    break;
-                default:
-                    System.out.println("Неверный выбор режима.");
-                    break;
+                case 1 -> cipher.encryptFile(fileManager, validator);
+                case 2 -> cipher.decryptFile(fileManager, validator);
+                case 3 -> bruteForce.decryptFileByBruteForce(fileManager, validator, ALPHABET);
+                default -> System.out.println("Неизвестный режим. Попробуйте ещё.");
             }
         } catch (IOException e) {
             System.out.println("Ошибка при загрузке словаря: " + e.getMessage());

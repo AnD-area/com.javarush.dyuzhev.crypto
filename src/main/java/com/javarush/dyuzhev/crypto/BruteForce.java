@@ -1,10 +1,11 @@
 package com.javarush.dyuzhev.crypto;
 
+import java.io.IOException;
+import java.util.Scanner;
 import java.util.Set;
 
 public class BruteForce {
     private final Set<String> dictionary;
-
     public BruteForce(Set<String> dictionary) {
         this.dictionary = dictionary;
     }
@@ -24,6 +25,27 @@ public class BruteForce {
             }
         }
         return null;
+    }
+
+    public void decryptFileByBruteForce(FileManager fileManager, Validator validator, char[] alphabet) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Введите путь к зашифрованному файлу:");
+        String encryptedFilePath = scanner.nextLine();
+        System.out.println("Введите путь к файлу для записи расшифрованного текста:");
+        String decryptedOutputFilePath = scanner.nextLine();
+
+        if (validator.isFileExists(encryptedFilePath)) {
+            try {
+                String encryptedText = fileManager.readFile(encryptedFilePath);
+                String decryptedText = decryptByBruteForce(encryptedText, alphabet);
+                fileManager.writeFile(decryptedText, decryptedOutputFilePath);
+                System.out.println("Файл успешно расшифрован и сохранен.");
+            } catch (IOException e) {
+                System.out.println("Ошибка при работе с файлами: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Неверный путь к файлу.");
+        }
     }
 
     private boolean isValidText(String text) {

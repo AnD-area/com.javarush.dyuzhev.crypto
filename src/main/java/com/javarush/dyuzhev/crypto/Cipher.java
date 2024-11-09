@@ -1,5 +1,8 @@
 package com.javarush.dyuzhev.crypto;
 
+import java.io.IOException;
+import java.util.Scanner;
+
 public class Cipher {
     private char[] alphabet;
     private final int alphabetLength;
@@ -56,4 +59,51 @@ public class Cipher {
         System.out.println("Original Key: " + key + " | Normalized Key: " + normalizedKey);
         return normalizedKey;
     }
+
+    public void encryptFile(FileManager fileManager, Validator validator) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Введите путь к файлу для шифрования:");
+        String inputFilePath = scanner.nextLine();
+        System.out.println("Введите путь к файлу для записи зашифрованного текста:");
+        String outputFilePath = scanner.nextLine();
+        System.out.println("Введите ключ шифрования:");
+        int key = scanner.nextInt();
+
+        if (validator.isFileExists(inputFilePath) && validator.isValidKey(key)) {
+            try {
+                String text = fileManager.readFile(inputFilePath);
+                String encryptedText = encrypt(text, key);
+                fileManager.writeFile(encryptedText, outputFilePath);
+                System.out.println("Файл успешно зашифрован и сохранен.");
+            } catch (IOException e) {
+                System.out.println("Ошибка при работе с файлами: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Неверный путь к файлу или ключ.");
+        }
+    }
+
+    public void decryptFile(FileManager fileManager, Validator validator) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Введите путь к зашифрованному файлу:");
+        String encryptedFilePath = scanner.nextLine();
+        System.out.println("Введите путь к файлу для записи расшифрованного текста:");
+        String decryptedOutputFilePath = scanner.nextLine();
+        System.out.println("Введите ключ шифрования:");
+        int decryptionKey = scanner.nextInt();
+
+        if (validator.isFileExists(encryptedFilePath) && validator.isValidKey(decryptionKey)) {
+            try {
+                String encryptedText = fileManager.readFile(encryptedFilePath);
+                String decryptedText = decrypt(encryptedText, decryptionKey);
+                fileManager.writeFile(decryptedText, decryptedOutputFilePath);
+                System.out.println("Файл успешно расшифрован и сохранен.");
+            } catch (IOException e) {
+                System.out.println("Ошибка при работе с файлами: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Неверный путь к файлу или ключ.");
+        }
+    }
+
 }
